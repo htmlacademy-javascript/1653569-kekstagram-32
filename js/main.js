@@ -143,4 +143,5 @@ const createUserPost = () => ({
   comments: similarComments(),
 });
 
-const similarUserPosts = Array.from({length: SIMILAR_USER_POST_COUNT}, createUserPost);
+export const similarUserPosts = Array.from({length: SIMILAR_USER_POST_COUNT}, createUserPost);
+

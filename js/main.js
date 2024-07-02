@@ -133,14 +133,14 @@ const createComment = () => ({
   name: getRandomArrayElement(NAMES),
 });
 
-const similarComments = () => Array.from({length: getCommentCount()}, createComment);
+const getComments = () => Array.from({length: getCommentCount()}, createComment);
 
 const createUserPost = () => ({
   id: getUserPostId(),
   url: `photos/${getPhotoId()}.jpg`,
   description: getRandomArrayElement(DESCRIPTIONS),
   likes: getLikeCount(),
-  comments: similarComments(),
+  comments: getComments(),
 });
 
 export const similarUserPosts = Array.from({length: SIMILAR_USER_POST_COUNT}, createUserPost);

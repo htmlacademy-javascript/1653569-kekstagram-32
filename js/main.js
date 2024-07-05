@@ -94,7 +94,7 @@ const getRandomInteger = (min, max) => {
 
 const getRandomArrayElement = (elements) => elements[getRandomInteger(0, elements.length - 1)];
 
-const getRandomIdFromRange = (min, max, {isUniqueId = false} = {}) => {
+const createNumberGenerator = (min, max, {isUniqueId = false} = {}) => {
   const prevValues = [];
 
   return () => {
@@ -113,18 +113,18 @@ const getRandomIdFromRange = (min, max, {isUniqueId = false} = {}) => {
 };
 
 const getRandomMessageElement = (messages, count) => {
-  const getMessageRandomId = getRandomIdFromRange(1, messages.length - 1, {isUniqueId: true});
+  const getMessageRandomId = createNumberGenerator(1, messages.length - 1, {isUniqueId: true});
   const similarMessages = Array.from({length: count}, getMessageRandomId);
   return similarMessages.map((item) => messages[item]).join(' ');
 };
 
-const getUserPostId = getRandomIdFromRange(MIN_ID_COUNT, MAX_ID_COUNT, {isUniqueId: true});
-const getPhotoId = getRandomIdFromRange(MIN_ID_COUNT, MAX_ID_COUNT, {isUniqueId: true});
-const getLikeCount = getRandomIdFromRange(MIN_LIKE_COUNT, MAX_LIKE_COUNT);
-const getCommentId = getRandomIdFromRange(MIN_ID_COUNT, MAX_COMMENT_COUNT * MAX_ID_COUNT, {isUniqueId: true});
-const getAvatarId = getRandomIdFromRange(MIN_ID_COUNT, MAX_AVATAR_COUNT);
-const getCommentCount = getRandomIdFromRange(MIN_COMMENT_COUNT, MAX_COMMENT_COUNT);
-const getMessageCount = getRandomIdFromRange(MIN_MESSAGE_COUNT, MAX_MESSAGE_COUNT);
+const getUserPostId = createNumberGenerator(MIN_ID_COUNT, MAX_ID_COUNT, {isUniqueId: true});
+const getPhotoId = createNumberGenerator(MIN_ID_COUNT, MAX_ID_COUNT, {isUniqueId: true});
+const getLikeCount = createNumberGenerator(MIN_LIKE_COUNT, MAX_LIKE_COUNT);
+const getCommentId = createNumberGenerator(MIN_ID_COUNT, MAX_COMMENT_COUNT * MAX_ID_COUNT, {isUniqueId: true});
+const getAvatarId = createNumberGenerator(MIN_ID_COUNT, MAX_AVATAR_COUNT);
+const getCommentCount = createNumberGenerator(MIN_COMMENT_COUNT, MAX_COMMENT_COUNT);
+const getMessageCount = createNumberGenerator(MIN_MESSAGE_COUNT, MAX_MESSAGE_COUNT);
 
 const createComment = () => ({
   id: getCommentId(),

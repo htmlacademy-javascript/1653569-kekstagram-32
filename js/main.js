@@ -1,3 +1,1 @@
-import {createUserPosts} from './data.js';
-
-createUserPosts();
+import './thumbnail.js';

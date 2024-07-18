@@ -1,4 +1,4 @@
-import {getRandomArrayElement, createNumberGenerator} from './util.js';
+import { getRandomArrayElement, createNumberGenerator } from './utils.js';
 
 const NAMES = [
   'Мария',
@@ -121,4 +121,4 @@ const createUserPost = () => ({
 
 const createUserPosts = () => Array.from({length: SIMILAR_USER_POST_COUNT}, createUserPost);
 
-export {createUserPosts};
+export { createUserPosts };

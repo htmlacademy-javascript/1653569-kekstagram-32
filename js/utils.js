@@ -25,6 +25,5 @@ const createNumberGenerator = (min, max, {isUniqueId = false} = {}) => {
 };
 
 const isEscapeKey = (evt) => evt.key === 'Escape';
-const isEnterKey = (evt) => evt.key === 'Enter';
 
-export { getRandomArrayElement, createNumberGenerator, isEscapeKey, isEnterKey };
+export { getRandomArrayElement, createNumberGenerator, isEscapeKey };

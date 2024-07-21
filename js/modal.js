@@ -1,139 +1,91 @@
 import { userPosts } from './main.js';
-import { isEscapeKey, isEnterKey } from './utils.js';
+import { isEscapeKey } from './utils.js';
+import {
+  clearComments,
+  setCommentCount,
+  renderComments,
+  toggleCommentsLoadMoreButton,
+  onCommentsLoadMoreButton,
+  commentsLoadMoreButton
+} from './comment.js';
 
-const COMMENT_COUNT = 5;
-
-const picturesList = document.querySelector('.pictures');
 const modalContainer = document.querySelector('.big-picture');
+const picturesList = document.querySelector('.pictures');
 const closeModalButton = modalContainer.querySelector('.big-picture__cancel');
-const bigPictureUrl = modalContainer.querySelector('.big-picture__img > img');
+const bigPicture = modalContainer.querySelector('.big-picture__img > img');
 const likesCount = modalContainer.querySelector('.likes-count');
 const socialCaption = modalContainer.querySelector('.social__caption');
-const commentsList = modalContainer.querySelector('.social__comments');
-const commentShownCount = modalContainer.querySelector('.social__comment-shown-count');
-const commentTotalCount = modalContainer.querySelector('.social__comment-total-count');
-const commentsLoaderButton = modalContainer.querySelector('.social__comments-loader');
 
-let commentCount = COMMENT_COUNT;
-let currentUserPost;
+let currentUserPost = null;
+let currentUserLink = null;
 
-const onEscapeKeydown = (evt) => {
+const onDocumentKeydown = (evt) => {
   if (isEscapeKey(evt)) {
     evt.preventDefault();
     closeModal();
   }
 };
 
-const onEnterKeydown = (evt) => {
-  if (isEnterKey(evt)) {
-    evt.preventDefault();
-    openModal(evt.target.dataset.id);
-  }
+const setCurrnetUserPost = (currentPostId) => {
+  currentUserPost = userPosts.find((post) => post.id === currentPostId);
 };
 
-const clearComments = ({resetCount = false} = {}) => {
-  if (resetCount) {
-    commentCount = COMMENT_COUNT;
-  }
-  commentsList.innerHTML = '';
-};
-
-const controlLoaderButton = ({hidden = false} = {}) => {
-  switch (hidden) {
-    case true:
-      commentsLoaderButton.classList.add('hidden');
-      break;
-    case false:
-      commentsLoaderButton.classList.remove('hidden');
-      break;
-  }
-};
-
-const getUserPost = (postId) => {
-  currentUserPost = userPosts.find((post) => post.id === parseInt(postId, 10));
-};
-
-const renderComments = () => {
-  const {comments} = currentUserPost;
-  const currentComments = comments.slice(0, commentCount);
-  const commentListFragment = document.createDocumentFragment();
-
-  currentComments.forEach(({avatar, message, name}) => {
-    const commentLiElement = document.createElement('li');
-    commentLiElement.classList.add('social__comment');
-
-    const commentImgElement = document.createElement('img');
-    commentImgElement.classList.add('social__picture');
-    commentImgElement.src = avatar;
-    commentImgElement.alt = name;
-    commentImgElement.width = 35;
-    commentImgElement.height = 35;
-
-    const commentPElement = document.createElement('p');
-    commentPElement.classList.add('social__text');
-    commentPElement.textContent = message;
-
-    commentLiElement.append(commentImgElement, commentPElement);
-    commentListFragment.append(commentLiElement);
-  });
-
-  commentsList.append(commentListFragment);
-
-  commentShownCount.textContent = currentComments.length;
-  commentTotalCount.textContent = comments.length;
-
-  if (currentComments.length === comments.length) {
-    controlLoaderButton({hidden: true});
-  }
-  commentCount += COMMENT_COUNT;
+const updateWindowSize = ({isResize = false} = {}) => {
+  const scrollbarWidth = isResize ? window.innerWidth - document.body.clientWidth : 0;
+  document.body.style.marginRight = `${scrollbarWidth}px`;
 };
 
 const renderSocial = () => {
   const {url, likes, description} = currentUserPost;
-  bigPictureUrl.src = url;
+  bigPicture.src = url;
   likesCount.textContent = likes;
   socialCaption.textContent = description;
 };
 
-const onLoaderButton = () => {
-  clearComments();
-  renderComments();
+const changeFocusedElement = ({isModal = false, isLink = false} = {}) => {
+  if (isModal) {
+    modalContainer.tabIndex = 0;
+    modalContainer.focus();
+  }
+
+  if (isLink) {
+    modalContainer.tabIndex = -1;
+    currentUserLink.focus();
+  }
 };
 
-function openModal(postId) {
+function openModal() {
   modalContainer.classList.remove('hidden');
+  updateWindowSize({isResize: true});
   document.body.classList.add('modal-open');
-  document.body.style.marginRight = `${26}px`;
-  document.addEventListener('keydown', onEscapeKeydown);
-  commentsLoaderButton.addEventListener('click', onLoaderButton);
-  getUserPost(postId);
+  document.addEventListener('keydown', onDocumentKeydown);
+  commentsLoadMoreButton.addEventListener('click', onCommentsLoadMoreButton);
   clearComments();
   renderSocial();
-  renderComments();
+  setCommentCount(renderComments);
+  changeFocusedElement({isModal: true});
 }
 
 function closeModal() {
   modalContainer.classList.add('hidden');
+  updateWindowSize();
   document.body.classList.remove('modal-open');
-  document.body.style.marginRight = 0;
-  document.removeEventListener('keydown', onEscapeKeydown);
-  commentsLoaderButton.removeEventListener('click', onLoaderButton);
+  document.removeEventListener('keydown', onDocumentKeydown);
   clearComments({resetCount: true});
-  controlLoaderButton();
+  toggleCommentsLoadMoreButton();
+  changeFocusedElement({isLink: true});
 }
 
 picturesList.addEventListener('click', (evt) => {
-  if (evt.target.parentElement.className === 'picture') {
-    openModal(evt.target.parentElement.dataset.id);
-  }
-});
-
-document.addEventListener('keydown', (evt) => {
-  if (evt.target.className === 'picture') {
-    onEnterKeydown(evt);
+  if (evt.target.closest('.picture')) {
+    currentUserLink = evt.target.closest('.picture');
+    setCurrnetUserPost(parseInt(currentUserLink.dataset.id, 10));
+    openModal();
   }
 });
 
 closeModalButton.addEventListener('click', () => {
   closeModal();
 });
+
+export { currentUserPost, modalContainer };

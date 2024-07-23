@@ -31,8 +31,9 @@ const setCurrnetUserPost = (currentPostId) => {
 };
 
 const updateWindowSize = ({isResize = false} = {}) => {
-  const scrollbarWidth = isResize ? window.innerWidth - document.body.clientWidth : 0;
-  document.body.style.marginRight = `${scrollbarWidth}px`;
+  const scrollbarWidth = isResize ? window.innerWidth - document.body.clientWidth : null;
+  document.body.style.marginRight = scrollbarWidth ? `${scrollbarWidth}px` : null;
+
 };
 
 const renderSocial = () => {

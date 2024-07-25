@@ -1,3 +1,8 @@
+const ClassName = {
+  'HIDDEN': 'hidden',
+  'MODAL': 'modal-open'
+};
+
 const getRandomInteger = (min, max) => {
   const lower = Math.ceil(Math.min(Math.abs(min), Math.abs(max)));
   const upper = Math.floor(Math.max(Math.abs(min), Math.abs(max)));
@@ -26,4 +31,13 @@ const createNumberGenerator = (min, max, {isUniqueId = false} = {}) => {
 
 const isEscapeKey = (evt) => evt.key === 'Escape';
 
-export { getRandomArrayElement, createNumberGenerator, isEscapeKey };
+const toggleClass = (element, className, force) => {
+  element.classList.toggle(className, force);
+};
+
+const updateWindowSize = ({isResize = false} = {}) => {
+  const scrollbarWidth = isResize ? window.innerWidth - document.body.clientWidth : null;
+  document.body.style.marginRight = scrollbarWidth ? `${scrollbarWidth}px` : null;
+};
+
+export { ClassName, updateWindowSize, getRandomArrayElement, createNumberGenerator, isEscapeKey, toggleClass };

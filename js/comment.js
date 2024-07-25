@@ -1,5 +1,4 @@
-import { currentUserPost } from './modal.js';
-import { modalContainer } from './modal.js';
+import { modalContainer, getCurrentUserPost } from './modal.js';
 
 const COMMENT_COUNT = 5;
 
@@ -27,7 +26,7 @@ const scrollCommentsList = () => {
 };
 
 const setCommentCount = (countComments) => {
-  const {comments} = currentUserPost;
+  const {comments} = getCurrentUserPost();
   const currentComments = countComments();
   commentShownCount.textContent = currentComments.length;
   commentTotalCount.textContent = comments.length;
@@ -40,7 +39,7 @@ const setCommentCount = (countComments) => {
 };
 
 const renderComments = () => {
-  const {comments} = currentUserPost;
+  const {comments} = getCurrentUserPost();
   const currentComments = comments.slice(0, commentCount);
   const commentFragment = document.createDocumentFragment();
 
@@ -73,13 +72,5 @@ const onCommentsLoadMoreButton = () => {
   scrollCommentsList();
 };
 
-export {
-  clearComments,
-  scrollCommentsList,
-  setCommentCount,
-  renderComments,
-  toggleCommentsLoadMoreButton,
-  onCommentsLoadMoreButton,
-  commentsLoadMoreButton,
-
-};
+export { clearComments, scrollCommentsList, setCommentCount, renderComments,
+  toggleCommentsLoadMoreButton, onCommentsLoadMoreButton, commentsLoadMoreButton };

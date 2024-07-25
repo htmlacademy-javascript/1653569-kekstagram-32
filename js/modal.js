@@ -1,17 +1,11 @@
-import { userPosts } from './main.js';
-import { isEscapeKey } from './utils.js';
-import {
-  clearComments,
-  setCommentCount,
-  renderComments,
-  toggleCommentsLoadMoreButton,
-  onCommentsLoadMoreButton,
-  commentsLoadMoreButton
-} from './comment.js';
+import { userPosts } from './thumbnail.js';
+import { ClassName, isEscapeKey, toggleClass, updateWindowSize } from './utils.js';
+import { clearComments, setCommentCount, renderComments, toggleCommentsLoadMoreButton,
+  onCommentsLoadMoreButton, commentsLoadMoreButton } from './comment.js';
 
 const modalContainer = document.querySelector('.big-picture');
 const picturesList = document.querySelector('.pictures');
-const closeModalButton = modalContainer.querySelector('.big-picture__cancel');
+const cancelModalButton = modalContainer.querySelector('.big-picture__cancel');
 const bigPicture = modalContainer.querySelector('.big-picture__img > img');
 const likesCount = modalContainer.querySelector('.likes-count');
 const socialCaption = modalContainer.querySelector('.social__caption');
@@ -30,14 +24,13 @@ const setCurrnetUserPost = (currentPostId) => {
   currentUserPost = userPosts.find((post) => post.id === currentPostId);
 };
 
-const updateWindowSize = ({isResize = false} = {}) => {
-  const scrollbarWidth = isResize ? window.innerWidth - document.body.clientWidth : null;
-  document.body.style.marginRight = scrollbarWidth ? `${scrollbarWidth}px` : null;
-
+const getCurrentUserPost = () => {
+  const currentPost = currentUserPost;
+  return currentPost;
 };
 
-const renderSocial = () => {
-  const {url, likes, description} = currentUserPost;
+const renderDetails = () => {
+  const {url, likes, description} = getCurrentUserPost();
   bigPicture.src = url;
   likesCount.textContent = likes;
   socialCaption.textContent = description;
@@ -56,21 +49,21 @@ const changeFocusedElement = ({isModal = false, isLink = false} = {}) => {
 };
 
 function openModal() {
-  modalContainer.classList.remove('hidden');
   updateWindowSize({isResize: true});
-  document.body.classList.add('modal-open');
+  toggleClass(modalContainer, ClassName.HIDDEN, false);
+  toggleClass(document.body, ClassName.MODAL, true);
   document.addEventListener('keydown', onDocumentKeydown);
   commentsLoadMoreButton.addEventListener('click', onCommentsLoadMoreButton);
   clearComments();
-  renderSocial();
+  renderDetails();
   setCommentCount(renderComments);
   changeFocusedElement({isModal: true});
 }
 
 function closeModal() {
-  modalContainer.classList.add('hidden');
   updateWindowSize();
-  document.body.classList.remove('modal-open');
+  toggleClass(modalContainer, ClassName.HIDDEN, true);
+  toggleClass(document.body, ClassName.MODAL, false);
   document.removeEventListener('keydown', onDocumentKeydown);
   clearComments({resetCount: true});
   toggleCommentsLoadMoreButton();
@@ -85,8 +78,8 @@ picturesList.addEventListener('click', (evt) => {
   }
 });
 
-closeModalButton.addEventListener('click', () => {
+cancelModalButton.addEventListener('click', () => {
   closeModal();
 });
 
-export { currentUserPost, modalContainer };
+export { getCurrentUserPost, modalContainer };

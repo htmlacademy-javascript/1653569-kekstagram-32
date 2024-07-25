@@ -1,4 +1,4 @@
-import { isEscapeKey, toggleClass, ClassName, updateWindowSize } from './utils';
+import { isEscapeKey, toggleClass, ClassName, updateWindowSize } from './utils.js';
 import { pristineInit, validateInput, hashtagInput, descriptionInput } from './validation.js';
 import { Filter, imagePreview, imageEffectLevel, sliderEffectLevel, resetScale } from './image.js';
 

@@ -1,4 +1,4 @@
-import { ClassName, toggleClass } from './utils';
+import { ClassName, toggleClass } from './utils.js';
 
 const MIN_IMAGE_ZOOM_IN = 100;
 const MAX_IMAGE_ZOOM_OUT = 25;

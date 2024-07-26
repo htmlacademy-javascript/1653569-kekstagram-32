@@ -1,26 +1,26 @@
 import { ClassName, toggleClass } from './utils.js';
 
-const MIN_IMAGE_ZOOM_IN = 100;
-const MAX_IMAGE_ZOOM_OUT = 25;
-const IMAGE_ZOOM_STEP = 25;
-const IMAGE_ZOOM_DEFAULT = 100;
+const MIN_SCALE = 25;
+const MAX_SCALE = 100;
+const SCALE_STEP = 25;
+const SCALE_DEFAULT = 100;
 
 const Effect = {
-  'CHROME': 'effect-chrome',
-  'SEPIA': 'effect-sepia',
-  'MARVIN': 'effect-marvin',
-  'FOBOS': 'effect-phobos',
-  'HEAT': 'effect-heat',
-  'DEFAULT': 'effect-none'
+  CHROME: 'effect-chrome',
+  SEPIA: 'effect-sepia',
+  MARVIN: 'effect-marvin',
+  FOBOS: 'effect-phobos',
+  HEAT: 'effect-heat',
+  DEFAULT: 'effect-none'
 };
 
 const Filter = {
-  'GRAYSCALE': 'grayscale',
-  'SEPIA': 'sepia',
-  'INVERT': 'invert',
-  'BLUR': 'blur',
-  'BRIGHTNESS': 'brightness',
-  'DEFAULT': 'none'
+  GRAYSCALE: 'grayscale',
+  SEPIA: 'sepia',
+  INVERT: 'invert',
+  BLUR: 'blur',
+  BRIGHTNESS: 'brightness',
+  DEFAULT: 'none'
 };
 
 const Option = {
@@ -36,15 +36,15 @@ const modalContainer = document.querySelector('.img-upload');
 const imagePreview = modalContainer.querySelector('.img-upload__preview > img');
 const imageScale = modalContainer.querySelector('.scale__control--value');
 const imageEffectLevel = modalContainer.querySelector('.img-upload__effect-level');
-const imageZoomInButton = modalContainer.querySelector('.scale__control--bigger');
-const imageZoomOutButton = modalContainer.querySelector('.scale__control--smaller');
+const scaleBiggerButton = modalContainer.querySelector('.scale__control--bigger');
+const scaleSmallerButton = modalContainer.querySelector('.scale__control--smaller');
 const slider = modalContainer.querySelector('.effect-level__slider');
 const sliderEffectList = modalContainer.querySelector('.effects__list');
 const sliderEffectLevel = modalContainer.querySelector('.effect-level__value');
 
 let currentEffect = Effect.DEFAULT;
 let currentFilter = Filter.DEFAULT;
-let currentScale = IMAGE_ZOOM_DEFAULT;
+let currentScale = SCALE_DEFAULT;
 
 noUiSlider.create(slider, {
   range: {
@@ -60,33 +60,40 @@ noUiSlider.create(slider, {
   }
 });
 
-const changeZoomPreview = ({isZoomIn = false, isZoomOut = false} = {}) => {
-  currentScale = parseInt(imageScale.value, 10);
-  if (isZoomIn && currentScale < MIN_IMAGE_ZOOM_IN) {
-    imageScale.value = `${currentScale + IMAGE_ZOOM_STEP}%`;
+const changeScalePreview = ({isSmaller = false, isBigger = false} = {}) => {
+  if (isSmaller === isBigger) {
+    return;
   }
-  if (isZoomOut && currentScale > MAX_IMAGE_ZOOM_OUT) {
-    imageScale.value = `${currentScale - IMAGE_ZOOM_STEP}%`;
+  if (isSmaller && currentScale > MIN_SCALE) {
+    currentScale -= SCALE_STEP;
   }
-  imagePreview.style.transform = `scale(${parseInt(imageScale.value, 10) / 100})`;
+  if (isBigger && currentScale < MAX_SCALE) {
+    currentScale += SCALE_STEP;
+  }
+  imagePreview.style.transform = `scale(${currentScale / 100})`;
+  imageScale.value = `${currentScale}%`;
+};
+
+const setFilterValue = ({unit = ''} = {}) => {
+  imagePreview.style.filter = `${currentFilter}(${sliderEffectLevel.value}${unit})`;
 };
 
 const changeFilterValue = () => {
   switch (currentFilter) {
     case Filter.GRAYSCALE:
-      imagePreview.style.filter = `${currentFilter}(${sliderEffectLevel.value})`;
+      setFilterValue();
       break;
     case Filter.SEPIA:
-      imagePreview.style.filter = `${currentFilter}(${sliderEffectLevel.value})`;
+      setFilterValue();
       break;
     case Filter.INVERT:
-      imagePreview.style.filter = `${currentFilter}(${sliderEffectLevel.value}%)`;
+      setFilterValue({unit: '%'});
       break;
     case Filter.BLUR:
-      imagePreview.style.filter = `${currentFilter}(${sliderEffectLevel.value}px)`;
+      setFilterValue({unit: 'px'});
       break;
     case Filter.BRIGHTNESS:
-      imagePreview.style.filter = `${currentFilter}(${sliderEffectLevel.value})`;
+      setFilterValue();
       break;
     default:
       imagePreview.style.filter = Filter.DEFAULT;
@@ -105,39 +112,7 @@ const getCurrentOptions = () => {
   });
 };
 
-const resetScale = () => {
-  imageScale.value = IMAGE_ZOOM_DEFAULT;
-};
-
-slider.noUiSlider.on('update', () => {
-  sliderEffectLevel.value = slider.noUiSlider.get();
-  changeFilterValue();
-});
-
-imageZoomInButton.addEventListener('click', () => {
-  changeZoomPreview({isZoomIn: true});
-});
-
-imageZoomOutButton.addEventListener('click', () => {
-  changeZoomPreview({isZoomOut: true});
-});
-
-sliderEffectList.addEventListener('change', (evt) => {
-  evt.preventDefault();
-  const effectItem = evt.target
-    .closest('.effects__item')
-    .querySelector('input[type="radio"]');
-
-  if (effectItem.checked) {
-    currentEffect = effectItem.id;
-  }
-
-  if (currentEffect === Effect.DEFAULT) {
-    toggleClass(imageEffectLevel, ClassName.HIDDEN, true);
-  } else {
-    toggleClass(imageEffectLevel, ClassName.HIDDEN, false);
-  }
-
+const setCurrentEffect = () => {
   switch(currentEffect) {
     case Effect.CHROME:
       currentFilter = Filter.GRAYSCALE;
@@ -162,6 +137,44 @@ sliderEffectList.addEventListener('change', (evt) => {
     default: currentFilter = Filter.DEFAULT;
       slider.noUiSlider.updateOptions(getCurrentOptions());
   }
+};
+
+const resetImageStyle = () => {
+  imagePreview.style.filter = Filter.DEFAULT;
+  imagePreview.style.transform = Filter.DEFAULT;
+  imageScale.value = SCALE_DEFAULT;
+};
+
+slider.noUiSlider.on('update', () => {
+  sliderEffectLevel.value = slider.noUiSlider.get();
+  changeFilterValue();
 });
 
-export { Filter, imagePreview, imageEffectLevel, sliderEffectLevel, resetScale };
+scaleBiggerButton.addEventListener('click', () => {
+  changeScalePreview({isBigger: true});
+});
+
+scaleSmallerButton.addEventListener('click', () => {
+  changeScalePreview({isSmaller: true});
+});
+
+sliderEffectList.addEventListener('change', (evt) => {
+  evt.preventDefault();
+  const effectItem = evt.target
+    .closest('.effects__item')
+    .querySelector('input[type="radio"]');
+
+  if (effectItem.checked) {
+    currentEffect = effectItem.id;
+  }
+
+  if (currentEffect === Effect.DEFAULT) {
+    toggleClass(imageEffectLevel, ClassName.HIDDEN, true);
+  } else {
+    toggleClass(imageEffectLevel, ClassName.HIDDEN, false);
+  }
+
+  setCurrentEffect();
+});
+
+export { Filter, imagePreview, imageEffectLevel, sliderEffectLevel, resetImageStyle };

@@ -1,6 +1,6 @@
 import { isEscapeKey, toggleClass, ClassName, updateWindowSize } from './utils.js';
 import { pristineInit, validateInput, hashtagInput, descriptionInput } from './validation.js';
-import { Filter, imagePreview, imageEffectLevel, sliderEffectLevel, resetScale } from './image.js';
+import { imageEffectLevel, sliderEffectLevel, resetImageStyle } from './image.js';
 
 const form = document.querySelector('.img-upload__form');
 const cancelFormButton = form.querySelector('.img-upload__cancel');
@@ -27,9 +27,8 @@ const resetForm = () => {
   imageInput.value = null;
   descriptionInput.value = null;
   sliderEffectLevel.value = null;
-  imagePreview.style = Filter.NONE;
   pristine.reset();
-  resetScale();
+  resetImageStyle();
 };
 
 const openForm = () => {
@@ -60,5 +59,3 @@ form.addEventListener('submit', (evt) => {
   evt.preventDefault();
   pristine.validate();
 });
-
-export { form, hashtagInput, descriptionInput };

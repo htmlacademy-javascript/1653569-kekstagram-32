@@ -1,9 +1,11 @@
-import { userPosts } from './main.js';
+import { createUserPosts } from './data.js';
 
 const picturesList = document.querySelector('.pictures');
 const pictureTemplate = document.querySelector('#picture')
   .content
   .querySelector('.picture');
+
+const userPosts = createUserPosts();
 
 const renderThumbnails = (posts) => {
   const picturesListFragment = document.createDocumentFragment();
@@ -21,8 +23,6 @@ const renderThumbnails = (posts) => {
   picturesList.append(picturesListFragment);
 };
 
-const initThumbnails = () => {
-  renderThumbnails(userPosts);
-};
+renderThumbnails(userPosts);
 
-export { initThumbnails };
+export { userPosts };

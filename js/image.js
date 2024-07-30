@@ -41,6 +41,7 @@ const scaleSmallerButton = modalContainer.querySelector('.scale__control--smalle
 const slider = modalContainer.querySelector('.effect-level__slider');
 const sliderEffectList = modalContainer.querySelector('.effects__list');
 const sliderEffectLevel = modalContainer.querySelector('.effect-level__value');
+const defaultEffect = modalContainer.querySelector('#effect-none');
 
 let currentEffect = Effect.DEFAULT;
 let currentFilter = Filter.DEFAULT;
@@ -140,9 +141,14 @@ const setCurrentEffect = () => {
 };
 
 const resetImageStyle = () => {
+  currentEffect = Effect.DEFAULT;
+  currentFilter = Filter.DEFAULT;
+  currentScale = SCALE_DEFAULT;
   imagePreview.style.filter = Filter.DEFAULT;
   imagePreview.style.transform = Filter.DEFAULT;
-  imageScale.value = SCALE_DEFAULT;
+  imageScale.value = `${SCALE_DEFAULT}%`;
+  sliderEffectLevel.value = null;
+  defaultEffect.checked = true;
 };
 
 slider.noUiSlider.on('update', () => {
@@ -177,4 +183,4 @@ sliderEffectList.addEventListener('change', (evt) => {
   setCurrentEffect();
 });
 
-export { Filter, imagePreview, imageEffectLevel, sliderEffectLevel, resetImageStyle };
+export { Filter, imagePreview, imageEffectLevel, resetImageStyle };

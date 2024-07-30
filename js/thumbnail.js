@@ -1,16 +1,10 @@
-import { createUserPosts } from './data.js';
-
 const picturesList = document.querySelector('.pictures');
-const pictureTemplate = document.querySelector('#picture')
-  .content
-  .querySelector('.picture');
+const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
 
-const userPosts = createUserPosts();
-
-const renderThumbnails = (posts) => {
+const renderThumbnails = (userPosts) => {
   const picturesListFragment = document.createDocumentFragment();
 
-  posts.forEach(({id, url, description, comments, likes}) => {
+  userPosts.forEach(({id, url, description, comments, likes}) => {
     const post = pictureTemplate.cloneNode(true);
     post.dataset.id = id;
     post.querySelector('.picture__img').src = url;
@@ -23,6 +17,4 @@ const renderThumbnails = (posts) => {
   picturesList.append(picturesListFragment);
 };
 
-renderThumbnails(userPosts);
-
-export { userPosts };
+export { renderThumbnails };

@@ -1,4 +1,3 @@
-import { userPosts } from './thumbnail.js';
 import { ClassName, isEscapeKey, toggleClass, updateWindowSize } from './utils.js';
 import { clearComments, setCommentCount, renderComments, toggleCommentsLoadMoreButton,
   onCommentsLoadMoreButton, commentsLoadMoreButton } from './comment.js';
@@ -10,8 +9,13 @@ const bigPicture = modalContainer.querySelector('.big-picture__img > img');
 const likesCount = modalContainer.querySelector('.likes-count');
 const socialCaption = modalContainer.querySelector('.social__caption');
 
+let userPosts = [];
 let currentUserPost = null;
 let currentUserLink = null;
+
+const setUserPosts = (data) => {
+  userPosts = data;
+};
 
 const onDocumentKeydown = (evt) => {
   if (isEscapeKey(evt)) {
@@ -37,11 +41,13 @@ const renderDetails = () => {
 };
 
 const changeFocusedElement = ({isModal = false, isLink = false} = {}) => {
+  if (isModal === isLink) {
+    return;
+  }
   if (isModal) {
     modalContainer.tabIndex = 0;
     modalContainer.focus();
   }
-
   if (isLink) {
     modalContainer.tabIndex = -1;
     currentUserLink.focus();
@@ -82,4 +88,4 @@ cancelModalButton.addEventListener('click', () => {
   closeModal();
 });
 
-export { getCurrentUserPost, modalContainer };
+export { getCurrentUserPost, setUserPosts, modalContainer };

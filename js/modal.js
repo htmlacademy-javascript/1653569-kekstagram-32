@@ -1,6 +1,6 @@
 import { ClassName, isEscapeKey, toggleClass, updateWindowSize } from './utils.js';
 import { clearComments, setCommentCount, renderComments, toggleCommentsLoadMoreButton,
-  onCommentsLoadMoreButton, commentsLoadMoreButton } from './comment.js';
+  onCommentsLoadMoreButton, commentsLoadMoreButton} from './comment.js';
 
 const modalContainer = document.querySelector('.big-picture');
 const picturesList = document.querySelector('.pictures');
@@ -54,6 +54,10 @@ const changeFocusedElement = ({isModal = false, isLink = false} = {}) => {
   }
 };
 
+const resetScroll = () => {
+  modalContainer.scrollTop = 0;
+};
+
 function openModal() {
   updateWindowSize({isResize: true});
   toggleClass(modalContainer, ClassName.HIDDEN, false);
@@ -64,6 +68,7 @@ function openModal() {
   renderDetails();
   setCommentCount(renderComments);
   changeFocusedElement({isModal: true});
+  resetScroll();
 }
 
 function closeModal() {

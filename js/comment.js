@@ -22,7 +22,7 @@ const toggleCommentsLoadMoreButton = ({isHidden = false} = {}) => {
 };
 
 const scrollCommentsList = () => {
-  modalContainer.scrollTo({top: commentsList.scrollHeight, behavior: 'smooth'});
+  modalContainer.scrollTo({top: modalContainer.scrollHeight, behavior: 'smooth'});
 };
 
 const setCommentCount = (countComments) => {

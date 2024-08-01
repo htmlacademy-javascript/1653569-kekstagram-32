@@ -1,5 +1,5 @@
 import { isEscapeKey, toggleClass, ClassName, updateWindowSize } from './utils.js';
-import { pristineInit, validateInput, hashtagInput, descriptionInput } from './validation.js';
+import { pristine, hashtagInput, descriptionInput } from './validation.js';
 import { imageEffectLevel, resetImageStyle } from './image.js';
 import { sendData } from './api.js';
 
@@ -11,11 +11,7 @@ const submitButton = form.querySelector('.img-upload__submit');
 const successTemplate = document.querySelector('#success').content.querySelector('.success');
 const errorTemplate = document.querySelector('#error').content.querySelector('.error');
 
-let errorOverlay = null;
-let successOverlay = null;
-
-const pristine = pristineInit();
-validateInput(pristine);
+let currentOverlay = null;
 
 const onDocumentKeydown = (evt) => {
   if (document.activeElement === hashtagInput || document.activeElement === descriptionInput) {
@@ -23,18 +19,18 @@ const onDocumentKeydown = (evt) => {
     return;
   }
 
-  if (isEscapeKey(evt) && successOverlay) {
+  if (isEscapeKey(evt) && currentOverlay?.classList.contains('success')) {
     evt.preventDefault();
-    successOverlay.remove();
-    successOverlay = null;
+    currentOverlay.remove();
+    currentOverlay = null;
     document.removeEventListener('keydown', onDocumentKeydown);
     return;
   }
 
-  if (isEscapeKey(evt) && errorOverlay) {
+  if (isEscapeKey(evt) && currentOverlay?.classList.contains('error')) {
     evt.preventDefault();
-    errorOverlay.remove();
-    errorOverlay = null;
+    currentOverlay.remove();
+    currentOverlay = null;
     return;
   }
 
@@ -45,8 +41,8 @@ const onDocumentKeydown = (evt) => {
 };
 
 const resetForm = () => {
-  hashtagInput.value = null;
   imageInput.value = null;
+  hashtagInput.value = null;
   descriptionInput.value = null;
   pristine.reset();
   resetImageStyle();
@@ -60,18 +56,18 @@ const openForm = () => {
   document.addEventListener('keydown', onDocumentKeydown);
 };
 
-function closeForm({isSuccess = false} = {}) {
+function closeForm({isRemoveListener = true} = {}) {
   updateWindowSize();
   toggleClass(formOverlay, ClassName.HIDDEN, true);
   toggleClass(document.body, ClassName.MODAL, false);
   resetForm();
-  if (!isSuccess) {
+  if (isRemoveListener) {
     document.removeEventListener('keydown', onDocumentKeydown);
   }
 }
 
-const closeFormSuccess = () => {
-  closeForm({isSuccess: true});
+const closeFormAfterSubmit = () => {
+  closeForm({isRemoveListener: false});
 };
 
 const blockSubmitButton = () => {
@@ -82,40 +78,31 @@ const unblockSubmitButton = () => {
   submitButton.disabled = false;
 };
 
-const showSuccess = () => {
-  document.body.append(successTemplate);
-  successOverlay = document.querySelector('.success');
-  const successLoadButton = successOverlay.querySelector('.success__button');
+const showMessage = (type, template) => {
+  document.body.append(template);
+  const overlay = document.querySelector(`.${type}`);
+  const overlayButton = overlay.querySelector(`.${type}__button`);
+  currentOverlay = overlay;
 
-  successLoadButton.addEventListener('click', (evt) => {
+  overlay.addEventListener('click', (evt) => {
     evt.preventDefault();
-    successOverlay.remove();
+    if (evt.target === currentOverlay) {
+      overlay.remove();
+    }
   });
 
-  successOverlay.addEventListener('click', (evt) => {
+  overlayButton.addEventListener('click', (evt) => {
     evt.preventDefault();
-    if (evt.target === successOverlay) {
-      successOverlay.remove();
-    }
+    overlay.remove();
   });
 };
 
+const showSuccess = () => {
+  showMessage('success', successTemplate);
+};
+
 const showError = () => {
-  document.body.append(errorTemplate);
-  errorOverlay = document.querySelector('.error');
-  const errorLoadButton = errorOverlay.querySelector('.error__button');
-
-  errorLoadButton.addEventListener('click', (evt) => {
-    evt.preventDefault();
-    errorOverlay.remove();
-  });
-
-  errorOverlay.addEventListener('click', (evt) => {
-    evt.preventDefault();
-    if (evt.target === errorOverlay) {
-      errorOverlay.remove();
-    }
-  });
+  showMessage('error', errorTemplate);
 };
 
 imageInput.addEventListener('change', () => {
@@ -134,7 +121,7 @@ const setUserFromSubmit = (onSuccess) => {
       blockSubmitButton();
       sendData(new FormData(evt.target))
         .then(onSuccess)
-        .then(closeFormSuccess)
+        .then(closeFormAfterSubmit)
         .catch(showError)
         .finally(unblockSubmitButton);
     }

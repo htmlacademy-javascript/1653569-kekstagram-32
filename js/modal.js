@@ -1,7 +1,6 @@
-import { userPosts } from './thumbnail.js';
 import { ClassName, isEscapeKey, toggleClass, updateWindowSize } from './utils.js';
 import { clearComments, setCommentCount, renderComments, toggleCommentsLoadMoreButton,
-  onCommentsLoadMoreButton, commentsLoadMoreButton } from './comment.js';
+  onCommentsLoadMoreButton, commentsLoadMoreButton} from './comment.js';
 
 const modalContainer = document.querySelector('.big-picture');
 const picturesList = document.querySelector('.pictures');
@@ -10,8 +9,13 @@ const bigPicture = modalContainer.querySelector('.big-picture__img > img');
 const likesCount = modalContainer.querySelector('.likes-count');
 const socialCaption = modalContainer.querySelector('.social__caption');
 
+let userPosts = [];
 let currentUserPost = null;
 let currentUserLink = null;
+
+const setUserPosts = (data) => {
+  userPosts = data;
+};
 
 const onDocumentKeydown = (evt) => {
   if (isEscapeKey(evt)) {
@@ -37,15 +41,21 @@ const renderDetails = () => {
 };
 
 const changeFocusedElement = ({isModal = false, isLink = false} = {}) => {
+  if (isModal === isLink) {
+    return;
+  }
   if (isModal) {
     modalContainer.tabIndex = 0;
     modalContainer.focus();
   }
-
   if (isLink) {
     modalContainer.tabIndex = -1;
     currentUserLink.focus();
   }
+};
+
+const resetScroll = () => {
+  modalContainer.scrollTop = 0;
 };
 
 function openModal() {
@@ -58,6 +68,7 @@ function openModal() {
   renderDetails();
   setCommentCount(renderComments);
   changeFocusedElement({isModal: true});
+  resetScroll();
 }
 
 function closeModal() {
@@ -82,4 +93,4 @@ cancelModalButton.addEventListener('click', () => {
   closeModal();
 });
 
-export { getCurrentUserPost, modalContainer };
+export { getCurrentUserPost, setUserPosts, modalContainer };

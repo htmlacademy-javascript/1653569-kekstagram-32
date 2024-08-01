@@ -1,7 +1,11 @@
+const ALERT_SHOW_TIME = 5000;
+
 const ClassName = {
   'HIDDEN': 'hidden',
   'MODAL': 'modal-open'
 };
+
+const alertTemplate = document.querySelector('#data-error').content.querySelector('.data-error');
 
 const getRandomInteger = (min, max) => {
   const lower = Math.ceil(Math.min(Math.abs(min), Math.abs(max)));
@@ -40,4 +44,11 @@ const updateWindowSize = ({isResize = false} = {}) => {
   document.body.style.marginRight = scrollbarWidth ? `${scrollbarWidth}px` : null;
 };
 
-export { ClassName, updateWindowSize, getRandomArrayElement, createNumberGenerator, isEscapeKey, toggleClass };
+const showAlert = () => {
+  document.body.append(alertTemplate);
+  setTimeout(() => {
+    alertTemplate.remove();
+  }, ALERT_SHOW_TIME);
+};
+
+export { ClassName, updateWindowSize, getRandomArrayElement, createNumberGenerator, isEscapeKey, toggleClass, showAlert };

@@ -13,7 +13,7 @@ const fieldsInput = document.querySelector('.img-upload__text');
 const hashtagInput = fieldsInput.querySelector('.text__hashtags');
 const descriptionInput = fieldsInput.querySelector('.text__description');
 
-const pristineInit = () => new Pristine(fieldsInput, {
+const pristine = new Pristine(fieldsInput, {
   classTo: 'img-upload__field-wrapper',
   errorTextParent: 'img-upload__field-wrapper',
   errorTextClass: 'img-upload__field-wrapper--error',
@@ -44,11 +44,9 @@ const checkHashtagRepeat = (tags) => {
 
 const validateDescription = (tags) => tags.length <= MAX_COMMENT_LENGTH;
 
-const validateInput = (pristine) => {
-  pristine.addValidator(hashtagInput, validateHashtag, ErrorText.INVALID_HASHTAG, 1, true);
-  pristine.addValidator(hashtagInput, checkHashtagRepeat, ErrorText.NOT_UNIQUE, 2, true);
-  pristine.addValidator(hashtagInput, checkHashtagCount, ErrorText.INVALID_HASHTAG_COUNT, 3, true);
-  pristine.addValidator(descriptionInput, validateDescription, ErrorText.INVALID_COMMENT_LENGTH);
-};
+pristine.addValidator(hashtagInput, validateHashtag, ErrorText.INVALID_HASHTAG, 1, true);
+pristine.addValidator(hashtagInput, checkHashtagRepeat, ErrorText.NOT_UNIQUE, 2, true);
+pristine.addValidator(hashtagInput, checkHashtagCount, ErrorText.INVALID_HASHTAG_COUNT, 3, true);
+pristine.addValidator(descriptionInput, validateDescription, ErrorText.INVALID_COMMENT_LENGTH);
 
-export { pristineInit, validateInput, hashtagInput, descriptionInput };
+export { pristine, hashtagInput, descriptionInput };

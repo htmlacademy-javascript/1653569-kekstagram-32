@@ -2,6 +2,7 @@ const picturesList = document.querySelector('.pictures');
 const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
 
 const renderThumbnails = (userPosts) => {
+  picturesList.querySelectorAll('.picture').forEach((picture) => picture.remove());
   const picturesListFragment = document.createDocumentFragment();
 
   userPosts.forEach(({id, url, description, comments, likes}) => {
@@ -17,4 +18,4 @@ const renderThumbnails = (userPosts) => {
   picturesList.append(picturesListFragment);
 };
 
-export { renderThumbnails };
+export { renderThumbnails, picturesList };

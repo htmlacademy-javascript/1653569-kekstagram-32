@@ -4,6 +4,7 @@ const MIN_SCALE = 25;
 const MAX_SCALE = 100;
 const SCALE_STEP = 25;
 const SCALE_DEFAULT = 100;
+const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 
 const Effect = {
   CHROME: 'effect-chrome',
@@ -41,6 +42,7 @@ const scaleSmallerButton = modalContainer.querySelector('.scale__control--smalle
 const slider = modalContainer.querySelector('.effect-level__slider');
 const sliderEffectList = modalContainer.querySelector('.effects__list');
 const sliderEffectLevel = modalContainer.querySelector('.effect-level__value');
+const effectsPreviews = modalContainer.querySelectorAll('.effects__preview');
 const defaultEffect = modalContainer.querySelector('#effect-none');
 
 let currentEffect = Effect.DEFAULT;
@@ -60,6 +62,18 @@ noUiSlider.create(slider, {
     from: (value) => Number(value)
   }
 });
+
+const loadPreview = (imageInput) => {
+  const imageFile = imageInput.files[0];
+  const imageFileName = imageFile.name.toLowerCase();
+  const matches = FILE_TYPES.some((item) => imageFileName.endsWith(item));
+  if (matches) {
+    imagePreview.src = URL.createObjectURL(imageFile);
+    effectsPreviews.forEach((el) => {
+      el.style.backgroundImage = `url('${imagePreview.src}')`;
+    });
+  }
+};
 
 const changeScalePreview = ({isSmaller = false, isBigger = false} = {}) => {
   if (isSmaller === isBigger) {
@@ -183,4 +197,4 @@ sliderEffectList.addEventListener('change', (evt) => {
   setCurrentEffect();
 });
 
-export { Filter, imagePreview, imageEffectLevel, resetImageStyle };
+export { Filter, imagePreview, imageEffectLevel, resetImageStyle, loadPreview };

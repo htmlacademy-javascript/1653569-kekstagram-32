@@ -1,6 +1,6 @@
 import { isEscapeKey, toggleClass, ClassName, updateWindowSize } from './utils.js';
 import { pristine, hashtagInput, descriptionInput } from './validation.js';
-import { imageEffectLevel, resetImageStyle } from './image.js';
+import { imageEffectLevel, loadPreview, resetImageStyle } from './image.js';
 import { sendData } from './api.js';
 
 const form = document.querySelector('.img-upload__form');
@@ -106,6 +106,7 @@ const showError = () => {
 };
 
 imageInput.addEventListener('change', () => {
+  loadPreview(imageInput);
   openForm();
 });
 

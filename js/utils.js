@@ -1,4 +1,5 @@
 const ALERT_SHOW_TIME = 5000;
+const TIMEOUT_DELAY = 500;
 
 const ClassName = {
   'HIDDEN': 'hidden',
@@ -6,32 +7,6 @@ const ClassName = {
 };
 
 const alertTemplate = document.querySelector('#data-error').content.querySelector('.data-error');
-
-const getRandomInteger = (min, max) => {
-  const lower = Math.ceil(Math.min(Math.abs(min), Math.abs(max)));
-  const upper = Math.floor(Math.max(Math.abs(min), Math.abs(max)));
-  return Math.floor(Math.random() * (upper - lower + 1) + lower);
-};
-
-const getRandomArrayElement = (elements) => elements[getRandomInteger(0, elements.length - 1)];
-
-const createNumberGenerator = (min, max, {isUniqueId = false} = {}) => {
-  const prevValues = [];
-
-  return () => {
-    let currentValue = getRandomInteger(min, max);
-    if (isUniqueId) {
-      if (prevValues.length >= (max - min + 1)) {
-        return;
-      }
-      while (prevValues.includes(currentValue)) {
-        currentValue = getRandomInteger(min, max);
-      }
-      prevValues.push(currentValue);
-    }
-    return currentValue;
-  };
-};
 
 const isEscapeKey = (evt) => evt.key === 'Escape';
 
@@ -51,4 +26,12 @@ const showAlert = () => {
   }, ALERT_SHOW_TIME);
 };
 
-export { ClassName, updateWindowSize, getRandomArrayElement, createNumberGenerator, isEscapeKey, toggleClass, showAlert };
+function debounce (callback) {
+  let timeoutId;
+  return (...rest) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => callback.apply(this, rest), TIMEOUT_DELAY);
+  };
+}
+
+export { ClassName, updateWindowSize, isEscapeKey, toggleClass, showAlert, debounce };

@@ -1,4 +1,5 @@
 import { modalContainer, getCurrentUserPost } from './modal.js';
+import { ClassName } from './utils.js';
 
 const COMMENT_COUNT = 5;
 
@@ -18,7 +19,7 @@ const clearComments = ({resetCount = false} = {}) => {
 };
 
 const toggleCommentsLoadMoreButton = ({isHidden = false} = {}) => {
-  commentsLoadMoreButton.classList.toggle('hidden', isHidden);
+  commentsLoadMoreButton.classList.toggle(ClassName.HIDDEN, isHidden);
 };
 
 const scrollCommentsList = () => {

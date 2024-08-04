@@ -1,4 +1,4 @@
-import { ClassName, isEscapeKey, toggleClass, updateWindowSize } from './utils.js';
+import { ClassName, isEscapeKey, resetScroll, updateWindowSize } from './utils.js';
 import { clearComments, setCommentCount, renderComments, toggleCommentsLoadMoreButton,
   onCommentsLoadMoreButton, commentsLoadMoreButton} from './comment.js';
 
@@ -28,14 +28,12 @@ const setCurrnetUserPost = (currentPostId) => {
   currentUserPost = userPosts.find((post) => post.id === currentPostId);
 };
 
-const getCurrentUserPost = () => {
-  const currentPost = currentUserPost;
-  return currentPost;
-};
+const getCurrentUserPost = () => currentUserPost;
 
 const renderDetails = () => {
-  const {url, likes, description} = getCurrentUserPost();
+  const {url, likes, description} = currentUserPost;
   bigPicture.src = url;
+  bigPicture.alt = description;
   likesCount.textContent = likes;
   socialCaption.textContent = description;
 };
@@ -54,27 +52,23 @@ const changeFocusedElement = ({isModal = false, isLink = false} = {}) => {
   }
 };
 
-const resetScroll = () => {
-  modalContainer.scrollTop = 0;
-};
-
 function openModal() {
   updateWindowSize({isResize: true});
-  toggleClass(modalContainer, ClassName.HIDDEN, false);
-  toggleClass(document.body, ClassName.MODAL, true);
+  modalContainer.classList.remove(ClassName.HIDDEN);
+  document.body.classList.add(ClassName.MODAL);
   document.addEventListener('keydown', onDocumentKeydown);
   commentsLoadMoreButton.addEventListener('click', onCommentsLoadMoreButton);
   clearComments();
   renderDetails();
   setCommentCount(renderComments);
   changeFocusedElement({isModal: true});
-  resetScroll();
+  resetScroll(modalContainer);
 }
 
 function closeModal() {
   updateWindowSize();
-  toggleClass(modalContainer, ClassName.HIDDEN, true);
-  toggleClass(document.body, ClassName.MODAL, false);
+  modalContainer.classList.add(ClassName.HIDDEN);
+  document.body.classList.remove(ClassName.MODAL);
   document.removeEventListener('keydown', onDocumentKeydown);
   clearComments({resetCount: true});
   toggleCommentsLoadMoreButton();

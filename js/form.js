@@ -1,7 +1,12 @@
-import { isEscapeKey, toggleClass, ClassName, updateWindowSize } from './utils.js';
+import { isEscapeKey, ClassName, updateWindowSize } from './utils.js';
 import { pristine, hashtagInput, descriptionInput } from './validation.js';
-import { imageEffectLevel, resetImageStyle } from './image.js';
+import { imageEffectLevel, loadPreview, resetImageStyle } from './image.js';
 import { sendData } from './api.js';
+
+const SubmitButtonText = {
+  DEFAULT: 'Опубликовать',
+  SUBMITTING: 'Отправляю...',
+};
 
 const form = document.querySelector('.img-upload__form');
 const cancelFormButton = form.querySelector('.img-upload__cancel');
@@ -11,34 +16,7 @@ const submitButton = form.querySelector('.img-upload__submit');
 const successTemplate = document.querySelector('#success').content.querySelector('.success');
 const errorTemplate = document.querySelector('#error').content.querySelector('.error');
 
-let currentOverlay = null;
-
-const onDocumentKeydown = (evt) => {
-  if (document.activeElement === hashtagInput || document.activeElement === descriptionInput) {
-    evt.stopPropagation();
-    return;
-  }
-
-  if (isEscapeKey(evt) && currentOverlay?.classList.contains('success')) {
-    evt.preventDefault();
-    currentOverlay.remove();
-    currentOverlay = null;
-    document.removeEventListener('keydown', onDocumentKeydown);
-    return;
-  }
-
-  if (isEscapeKey(evt) && currentOverlay?.classList.contains('error')) {
-    evt.preventDefault();
-    currentOverlay.remove();
-    currentOverlay = null;
-    return;
-  }
-
-  if (isEscapeKey(evt)) {
-    evt.preventDefault();
-    closeForm();
-  }
-};
+let currentMessage = null;
 
 const resetForm = () => {
   imageInput.value = null;
@@ -50,50 +28,44 @@ const resetForm = () => {
 
 const openForm = () => {
   updateWindowSize({isResize: true});
-  toggleClass(formOverlay, ClassName.HIDDEN, false);
-  toggleClass(document.body, ClassName.MODAL, true);
-  toggleClass(imageEffectLevel, ClassName.HIDDEN, true);
-  document.addEventListener('keydown', onDocumentKeydown);
+  formOverlay.classList.remove(ClassName.HIDDEN);
+  document.body.classList.add(ClassName.MODAL);
+  imageEffectLevel.classList.add(ClassName.HIDDEN);
+  document.addEventListener('keydown', onDocumentKeydownForm);
 };
 
-function closeForm({isRemoveListener = true} = {}) {
+const closeForm = () => {
   updateWindowSize();
-  toggleClass(formOverlay, ClassName.HIDDEN, true);
-  toggleClass(document.body, ClassName.MODAL, false);
+  formOverlay.classList.add(ClassName.HIDDEN);
+  document.body.classList.remove(ClassName.MODAL);
   resetForm();
-  if (isRemoveListener) {
-    document.removeEventListener('keydown', onDocumentKeydown);
-  }
-}
-
-const closeFormAfterSubmit = () => {
-  closeForm({isRemoveListener: false});
+  document.removeEventListener('keydown', onDocumentKeydownForm);
 };
 
-const blockSubmitButton = () => {
-  submitButton.disabled = true;
+const closeMessage = () => {
+  currentMessage.remove();
+  currentMessage = null;
+  document.removeEventListener('keydown', onDocumentKeydownMessage);
 };
 
-const unblockSubmitButton = () => {
-  submitButton.disabled = false;
-};
+const showMessage = (className, template) => {
+  const message = template.cloneNode(true);
+  document.body.append(message);
+  const overlay = document.querySelector(`.${className}`);
+  const overlayButton = overlay.querySelector(`.${className}__button`);
+  currentMessage = overlay;
 
-const showMessage = (type, template) => {
-  document.body.append(template);
-  const overlay = document.querySelector(`.${type}`);
-  const overlayButton = overlay.querySelector(`.${type}__button`);
-  currentOverlay = overlay;
-
+  document.addEventListener('keydown', onDocumentKeydownMessage);
   overlay.addEventListener('click', (evt) => {
     evt.preventDefault();
-    if (evt.target === currentOverlay) {
-      overlay.remove();
+    if (evt.target === currentMessage) {
+      closeMessage();
     }
   });
 
   overlayButton.addEventListener('click', (evt) => {
     evt.preventDefault();
-    overlay.remove();
+    closeMessage();
   });
 };
 
@@ -105,7 +77,37 @@ const showError = () => {
   showMessage('error', errorTemplate);
 };
 
+const blockSubmitButton = () => {
+  submitButton.disabled = true;
+  submitButton.textContent = SubmitButtonText.SUBMITTING;
+};
+
+const unblockSubmitButton = () => {
+  submitButton.disabled = false;
+  submitButton.textContent = SubmitButtonText.DEFAULT;
+};
+
+function onDocumentKeydownMessage (evt) {
+  if (isEscapeKey(evt) && currentMessage) {
+    evt.preventDefault();
+    closeMessage();
+  }
+}
+
+function onDocumentKeydownForm (evt) {
+  if (document.activeElement === hashtagInput || document.activeElement === descriptionInput) {
+    evt.stopPropagation();
+    return;
+  }
+
+  if (isEscapeKey(evt) && !currentMessage) {
+    evt.preventDefault();
+    closeForm();
+  }
+}
+
 imageInput.addEventListener('change', () => {
+  loadPreview(imageInput);
   openForm();
 });
 
@@ -121,7 +123,7 @@ const setUserFromSubmit = (onSuccess) => {
       blockSubmitButton();
       sendData(new FormData(evt.target))
         .then(onSuccess)
-        .then(closeFormAfterSubmit)
+        .then(showSuccess)
         .catch(showError)
         .finally(unblockSubmitButton);
     }

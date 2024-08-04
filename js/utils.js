@@ -10,13 +10,24 @@ const alertTemplate = document.querySelector('#data-error').content.querySelecto
 
 const isEscapeKey = (evt) => evt.key === 'Escape';
 
-const toggleClass = (element, className, force) => {
-  element.classList.toggle(className, force);
+const getRandomSortList = (elements) => {
+  let m = elements.length, t, i;
+  while (m) {
+    i = Math.floor(Math.random() * m--);
+    t = elements[m];
+    elements[m] = elements[i];
+    elements[i] = t;
+  }
+  return elements;
 };
 
 const updateWindowSize = ({isResize = false} = {}) => {
   const scrollbarWidth = isResize ? window.innerWidth - document.body.clientWidth : null;
   document.body.style.marginRight = scrollbarWidth ? `${scrollbarWidth}px` : null;
+};
+
+const resetScroll = (container) => {
+  container.scrollTop = 0;
 };
 
 const showAlert = () => {
@@ -34,4 +45,4 @@ function debounce (callback) {
   };
 }
 
-export { ClassName, updateWindowSize, isEscapeKey, toggleClass, showAlert, debounce };
+export { ClassName, updateWindowSize, resetScroll, isEscapeKey, getRandomSortList, showAlert, debounce };

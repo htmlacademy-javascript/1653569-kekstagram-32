@@ -1,6 +1,8 @@
 import { renderThumbnails } from './thumbnail.js';
+import { getRandomSortList } from './utils.js';
 
-const THUMBNAILS_COUNT = 10;
+const MIN_THUMBNAIL_COUNT = 0;
+const MAX_THUMBNAIL_COUNT = 10;
 
 const filter = document.querySelector('.img-filters');
 const filterContainer = filter.querySelector('.img-filters__form');
@@ -12,53 +14,46 @@ const Filter = {
 };
 
 let currentFilter = Filter.DEFAULT;
+let currentPosts = null;
 
 const renderRandomTumbnails = (posts) => {
-  const sortRandom = (list) => {
-    let m = list.length, t, i;
-    while (m) {
-      i = Math.floor(Math.random() * m--);
-      t = list[m];
-      list[m] = list[i];
-      list[i] = t;
-    }
-    return list;
-  };
-  const sortedTumbnails = sortRandom(posts.slice()).slice(0, THUMBNAILS_COUNT);
-  return renderThumbnails(sortedTumbnails);
+  const sortedTumbnails = getRandomSortList(posts.slice())
+    .slice(MIN_THUMBNAIL_COUNT, MAX_THUMBNAIL_COUNT);
+  renderThumbnails(sortedTumbnails);
 };
 
 const renderDiscussedThumbnails = (posts) => {
   const sortDiscussed = (a, b) => b.comments.length - a.comments.length;
   const sortedThumbnails = posts.slice().sort(sortDiscussed);
-  return renderThumbnails(sortedThumbnails);
+  renderThumbnails(sortedThumbnails);
 };
 
-const renderFilteredThumbnails = (posts) => {
+const renderFilteredThumbnails = () => {
   switch(currentFilter) {
     case Filter.RANDOM:
-      return renderRandomTumbnails(posts);
+      return renderRandomTumbnails(currentPosts);
     case Filter.DISCUSSED:
-      return renderDiscussedThumbnails(posts);
+      return renderDiscussedThumbnails(currentPosts);
     default:
-      return renderThumbnails(posts);
+      return renderThumbnails(currentPosts);
   }
 };
 
-const setFilterThumbnails = (posts, callback) => {
+const setFilterThumbnails = (callback) => {
   filterContainer.addEventListener('click', (evt) => {
     const currentButton = evt.target;
     if (currentFilter !== currentButton.id) {
       filter.querySelector('.img-filters__button--active').classList.remove('img-filters__button--active');
       currentButton.classList.add('img-filters__button--active');
       currentFilter = currentButton.id;
-      callback(posts);
+      callback();
     }
   });
 };
 
-const initFilter = () => {
+const initFilter = (posts) => {
   filter.classList.remove('img-filters--inactive');
+  currentPosts = posts.slice();
 };
 
 export { initFilter, setFilterThumbnails, renderFilteredThumbnails };

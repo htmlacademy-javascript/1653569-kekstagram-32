@@ -9,15 +9,25 @@ const ErrorText = {
   NOT_UNIQUE: 'Хэштеги повторяются'
 };
 
-const fieldsInput = document.querySelector('.img-upload__text');
-const hashtagInput = fieldsInput.querySelector('.text__hashtags');
-const descriptionInput = fieldsInput.querySelector('.text__description');
+const inputFields = document.querySelector('.img-upload__text');
+const hashtagInput = inputFields.querySelector('.text__hashtags');
+const descriptionInput = inputFields.querySelector('.text__description');
 
-const pristine = new Pristine(fieldsInput, {
+const pristine = new Pristine(inputFields, {
   classTo: 'img-upload__field-wrapper',
   errorTextParent: 'img-upload__field-wrapper',
   errorTextClass: 'img-upload__field-wrapper--error',
 });
+
+const resetValidation = () => {
+  hashtagInput.value = null;
+  descriptionInput.value = null;
+  pristine.reset();
+};
+
+const isFocusedField = () => document.activeElement === hashtagInput || document.activeElement === descriptionInput;
+
+const isValid = () => pristine.validate();
 
 const normalizeHashtags = (hashtags) => hashtags
   .trim()
@@ -49,4 +59,4 @@ pristine.addValidator(hashtagInput, checkHashtagRepeat, ErrorText.NOT_UNIQUE, 2,
 pristine.addValidator(hashtagInput, checkHashtagCount, ErrorText.INVALID_HASHTAG_COUNT, 3, true);
 pristine.addValidator(descriptionInput, validateDescription, ErrorText.INVALID_COMMENT_LENGTH);
 
-export { pristine, hashtagInput, descriptionInput };
+export { isValid, isFocusedField, resetValidation };

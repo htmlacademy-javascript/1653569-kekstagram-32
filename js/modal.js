@@ -1,13 +1,13 @@
+import { renderComments, clearComments, toggleCommentsLoadMoreButton, onCommentsLoadMoreButton} from './comment.js';
 import { ClassName, isEscapeKey, resetScroll, updateWindowSize } from './utils.js';
-import { clearComments, setCommentCount, renderComments, toggleCommentsLoadMoreButton,
-  onCommentsLoadMoreButton, commentsLoadMoreButton} from './comment.js';
 
 const modalContainer = document.querySelector('.big-picture');
 const picturesList = document.querySelector('.pictures');
-const cancelModalButton = modalContainer.querySelector('.big-picture__cancel');
+const cancelButton = modalContainer.querySelector('.big-picture__cancel');
 const bigPicture = modalContainer.querySelector('.big-picture__img > img');
 const likesCount = modalContainer.querySelector('.likes-count');
 const socialCaption = modalContainer.querySelector('.social__caption');
+const commentsLoadMoreButton = modalContainer.querySelector('.social__comments-loader');
 
 let userPosts = [];
 let currentUserPost = null;
@@ -28,8 +28,6 @@ const setCurrnetUserPost = (currentPostId) => {
   currentUserPost = userPosts.find((post) => post.id === currentPostId);
 };
 
-const getCurrentUserPost = () => currentUserPost;
-
 const renderDetails = () => {
   const {url, likes, description} = currentUserPost;
   bigPicture.src = url;
@@ -38,15 +36,11 @@ const renderDetails = () => {
   socialCaption.textContent = description;
 };
 
-const changeFocusedElement = ({isModal = false, isLink = false} = {}) => {
-  if (isModal === isLink) {
-    return;
-  }
+const changeFocusedElement = ({isModal = false} = {}) => {
   if (isModal) {
     modalContainer.tabIndex = 0;
     modalContainer.focus();
-  }
-  if (isLink) {
+  } else {
     modalContainer.tabIndex = -1;
     currentUserLink.focus();
   }
@@ -60,7 +54,7 @@ function openModal() {
   commentsLoadMoreButton.addEventListener('click', onCommentsLoadMoreButton);
   clearComments();
   renderDetails();
-  setCommentCount(renderComments);
+  renderComments(currentUserPost.comments);
   changeFocusedElement({isModal: true});
   resetScroll(modalContainer);
 }
@@ -72,19 +66,20 @@ function closeModal() {
   document.removeEventListener('keydown', onDocumentKeydown);
   clearComments({resetCount: true});
   toggleCommentsLoadMoreButton();
-  changeFocusedElement({isLink: true});
+  changeFocusedElement();
 }
 
 picturesList.addEventListener('click', (evt) => {
-  if (evt.target.closest('.picture')) {
-    currentUserLink = evt.target.closest('.picture');
+  const thumbnail = evt.target.closest('.picture');
+  if (thumbnail) {
+    currentUserLink = thumbnail;
     setCurrnetUserPost(parseInt(currentUserLink.dataset.id, 10));
     openModal();
   }
 });
 
-cancelModalButton.addEventListener('click', () => {
+cancelButton.addEventListener('click', () => {
   closeModal();
 });
 
-export { getCurrentUserPost, setUserPosts, modalContainer };
+export { setUserPosts };

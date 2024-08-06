@@ -2,8 +2,10 @@ const ALERT_SHOW_TIME = 5000;
 const TIMEOUT_DELAY = 500;
 
 const ClassName = {
-  'HIDDEN': 'hidden',
-  'MODAL': 'modal-open'
+  HIDDEN: 'hidden',
+  MODAL: 'modal-open',
+  SUCCESS: 'success',
+  ERROR: 'error'
 };
 
 const alertTemplate = document.querySelector('#data-error').content.querySelector('.data-error');
@@ -11,12 +13,10 @@ const alertTemplate = document.querySelector('#data-error').content.querySelecto
 const isEscapeKey = (evt) => evt.key === 'Escape';
 
 const getRandomSortList = (elements) => {
-  let m = elements.length, t, i;
-  while (m) {
-    i = Math.floor(Math.random() * m--);
-    t = elements[m];
-    elements[m] = elements[i];
-    elements[i] = t;
+  let count = elements.length, random;
+  while (count) {
+    random = Math.floor(Math.random() * count--);
+    [elements[count], elements[random]] = [elements[random], elements[count]];
   }
   return elements;
 };
@@ -31,9 +31,10 @@ const resetScroll = (container) => {
 };
 
 const showAlert = () => {
-  document.body.append(alertTemplate);
+  const alert = alertTemplate.cloneNode(true);
+  document.body.append(alert);
   setTimeout(() => {
-    alertTemplate.remove();
+    alert.remove();
   }, ALERT_SHOW_TIME);
 };
 

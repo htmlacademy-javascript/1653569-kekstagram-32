@@ -1,19 +1,21 @@
-import { modalContainer, getCurrentUserPost } from './modal.js';
 import { ClassName } from './utils.js';
 
-const COMMENT_COUNT = 5;
+const MIN_COMMENT_COUNT = 0;
+const STEP_COMMENT_COUNT = 5;
 
-const socialContainer = document.querySelector('.big-picture__social');
-const commentsList = socialContainer.querySelector('.social__comments');
-const commentShownCount = socialContainer.querySelector('.social__comment-shown-count');
-const commentTotalCount = socialContainer.querySelector('.social__comment-total-count');
-const commentsLoadMoreButton = socialContainer.querySelector('.social__comments-loader');
+const modalContainer = document.querySelector('.big-picture');
+const socialDetail = document.querySelector('.big-picture__social');
+const commentsList = socialDetail.querySelector('.social__comments');
+const commentShownCount = socialDetail.querySelector('.social__comment-shown-count');
+const commentTotalCount = socialDetail.querySelector('.social__comment-total-count');
+const commentsLoadMoreButton = socialDetail.querySelector('.social__comments-loader');
 
-let commentCount = COMMENT_COUNT;
+let currentComments = null;
+let commentCount = STEP_COMMENT_COUNT;
 
 const clearComments = ({resetCount = false} = {}) => {
   if (resetCount) {
-    commentCount = COMMENT_COUNT;
+    commentCount = STEP_COMMENT_COUNT;
   }
   commentsList.innerHTML = '';
 };
@@ -22,29 +24,23 @@ const toggleCommentsLoadMoreButton = ({isHidden = false} = {}) => {
   commentsLoadMoreButton.classList.toggle(ClassName.HIDDEN, isHidden);
 };
 
-const scrollCommentsList = () => {
-  modalContainer.scrollTo({top: modalContainer.scrollHeight, behavior: 'smooth'});
-};
+const setCommentCount = (sliceComments) => {
+  commentShownCount.textContent = sliceComments.length;
+  commentTotalCount.textContent = currentComments.length;
 
-const setCommentCount = (countComments) => {
-  const {comments} = getCurrentUserPost();
-  const currentComments = countComments();
-  commentShownCount.textContent = currentComments.length;
-  commentTotalCount.textContent = comments.length;
-
-  if (currentComments.length === comments.length) {
+  if (currentComments.length === sliceComments.length) {
     toggleCommentsLoadMoreButton({isHidden: true});
   }
 
-  commentCount += COMMENT_COUNT;
+  commentCount += STEP_COMMENT_COUNT;
 };
 
-const renderComments = () => {
-  const {comments} = getCurrentUserPost();
-  const currentComments = comments.slice(0, commentCount);
+const renderComments = (postComments) => {
+  currentComments = postComments;
+  const sliceComments = currentComments.slice(MIN_COMMENT_COUNT, commentCount);
   const commentFragment = document.createDocumentFragment();
 
-  currentComments.forEach(({avatar, message, name}) => {
+  sliceComments.forEach(({avatar, message, name}) => {
     const commentListItem = document.createElement('li');
     commentListItem.classList.add('social__comment');
 
@@ -64,14 +60,17 @@ const renderComments = () => {
   });
 
   commentsList.append(commentFragment);
-  return currentComments;
+  setCommentCount(sliceComments);
+};
+
+const scrollCommentList = () => {
+  modalContainer.scrollTo({top: modalContainer.scrollHeight, behavior: 'smooth'});
 };
 
 const onCommentsLoadMoreButton = () => {
   clearComments();
-  setCommentCount(renderComments);
-  scrollCommentsList();
+  renderComments(currentComments);
+  scrollCommentList();
 };
 
-export { clearComments, scrollCommentsList, setCommentCount, renderComments,
-  toggleCommentsLoadMoreButton, onCommentsLoadMoreButton, commentsLoadMoreButton };
+export { clearComments, renderComments, toggleCommentsLoadMoreButton, onCommentsLoadMoreButton };

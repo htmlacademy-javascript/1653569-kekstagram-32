@@ -67,10 +67,10 @@ const scrollCommentList = () => {
   modalContainer.scrollTo({top: modalContainer.scrollHeight, behavior: 'smooth'});
 };
 
-const onCommentsLoadMoreButton = () => {
+const onCommentsLoadMoreButtonClick = () => {
   clearComments();
   renderComments(currentComments);
   scrollCommentList();
 };
 
-export { clearComments, renderComments, toggleCommentsLoadMoreButton, onCommentsLoadMoreButton };
+export { clearComments, renderComments, toggleCommentsLoadMoreButton, onCommentsLoadMoreButtonClick };

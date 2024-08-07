@@ -8,8 +8,8 @@ let currentScale = SCALE_DEFAULT;
 const modalContainer = document.querySelector('.img-upload');
 const imagePreview = modalContainer.querySelector('.img-upload__preview > img');
 const imageScale = modalContainer.querySelector('.scale__control--value');
-const scaleBiggerButton = modalContainer.querySelector('.scale__control--bigger');
 const scaleSmallerButton = modalContainer.querySelector('.scale__control--smaller');
+const scaleBiggerButton = modalContainer.querySelector('.scale__control--bigger');
 
 const resetImageScale = () => {
   currentScale = SCALE_DEFAULT;
@@ -21,21 +21,21 @@ const changeScalePreview = () => {
   imageScale.value = `${currentScale}%`;
 };
 
-const onSmallerButtonClick = () => {
+const onScaleSmallerButtonClick = () => {
   if (currentScale > MIN_SCALE) {
     currentScale -= SCALE_STEP;
     changeScalePreview();
   }
 };
 
-const onBiggerButtonClick = () => {
+const onScaleBiggerButtonClick = () => {
   if (currentScale < MAX_SCALE) {
     currentScale += SCALE_STEP;
     changeScalePreview();
   }
 };
 
-scaleSmallerButton.addEventListener('click', onSmallerButtonClick);
-scaleBiggerButton.addEventListener('click', onBiggerButtonClick);
+scaleSmallerButton.addEventListener('click', onScaleSmallerButtonClick);
+scaleBiggerButton.addEventListener('click', onScaleBiggerButtonClick);
 
 export { resetImageScale };

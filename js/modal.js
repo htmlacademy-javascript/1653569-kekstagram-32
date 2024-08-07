@@ -1,4 +1,4 @@
-import { renderComments, clearComments, toggleCommentsLoadMoreButton, onCommentsLoadMoreButton} from './comment.js';
+import { renderComments, clearComments, toggleCommentsLoadMoreButton, onCommentsLoadMoreButtonClick} from './comment.js';
 import { ClassName, isEscapeKey, resetScroll, updateWindowSize } from './utils.js';
 
 const modalContainer = document.querySelector('.big-picture');
@@ -51,7 +51,7 @@ function openModal() {
   modalContainer.classList.remove(ClassName.HIDDEN);
   document.body.classList.add(ClassName.MODAL);
   document.addEventListener('keydown', onDocumentKeydown);
-  commentsLoadMoreButton.addEventListener('click', onCommentsLoadMoreButton);
+  commentsLoadMoreButton.addEventListener('click', onCommentsLoadMoreButtonClick);
   clearComments();
   renderDetails();
   renderComments(currentUserPost.comments);

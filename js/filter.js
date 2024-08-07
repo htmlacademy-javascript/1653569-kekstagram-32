@@ -23,7 +23,7 @@ const renderRandomTumbnails = (posts) => {
 };
 
 const renderDiscussedThumbnails = (posts) => {
-  const sortDiscussed = (a, b) => b.comments.length - a.comments.length;
+  const sortDiscussed = (postA, postB) => postB.comments.length - postA.comments.length;
   const sortedThumbnails = posts.slice().sort(sortDiscussed);
   renderThumbnails(sortedThumbnails);
 };
